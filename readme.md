@@ -37,7 +37,8 @@ When writing your rust code, keep in mind the following points:
       age: i32,
   }
   ```
-3. To run the program, use the following command:
+3. The return type of a select query is a vector of hashmaps. A hashmap correspond to one of the rows returned by the query.
+4. To run the program, use the following command:
 ```
 cargo run
 ```
