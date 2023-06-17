@@ -205,11 +205,11 @@ impl SmallormEngine {
             self.all_exec.extend(self.where_exec.clone());
         }
 
-        println!();
-        println!("Executing the following UPDATE query ...");
+        // println!();
+        // println!("Executing the following UPDATE query ...");
 
-        println!("{:?} ", &self.prepare);
-        println!("with input {:?} ", &self.all_exec);
+        // println!("{:?} ", &self.prepare);
+        // println!("with input {:?} ", &self.all_exec);
 
         let stmt = self.db.conn.prep(&self.prepare)?;
         let result = self.db.conn.exec_drop(stmt, &self.all_exec)?;
