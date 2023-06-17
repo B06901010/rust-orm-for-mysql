@@ -115,9 +115,9 @@ pub fn derive_field_names_types_as_array(input: TokenStream) -> TokenStream {
         .collect();
 
     // eprintln!("{:#?}", field_value_tokens);
-    for i in 0..field_value_tokens.len() {
-        eprintln!("{}", field_value_tokens[i])
-    }
+    // for i in 0..field_value_tokens.len() {
+    //     eprintln!("{}", field_value_tokens[i])
+    // }
 
     let vis = c_attrs
         .into_iter()

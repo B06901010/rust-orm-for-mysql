@@ -208,11 +208,11 @@ impl SmallormEngine {
             self.all_exec.extend(self.where_exec.clone());
         }
 
-        println!();
-        println!("Executing the following UPDATE query ...");
+        // println!();
+        // println!("Executing the following UPDATE query ...");
 
-        println!("{:?} ", &self.prepare);
-        println!("with input {:?} ", &self.all_exec);
+        // println!("{:?} ", &self.prepare);
+        // println!("with input {:?} ", &self.all_exec);
 
         let stmt = self.db.conn.prep(&self.prepare)?;
         let result = self.db.conn.exec_drop(stmt, &self.all_exec)?;
@@ -229,10 +229,10 @@ impl SmallormEngine {
             self.prepare += &(" WHERE ".to_owned() + &self.where_param.to_string());
         }
 
-        println!();
-        println!("Executing the following DELETE query ...");
-        println!("{:?} ", &self.prepare);
-        println!("with input {:?} ", &self.where_exec);
+        // println!();
+        // println!("Executing the following DELETE query ...");
+        // println!("{:?} ", &self.prepare);
+        // println!("with input {:?} ", &self.where_exec);
 
         self.all_exec = self.where_exec.clone();
 
@@ -261,9 +261,9 @@ impl SmallormEngine {
         }
         create_param += &(field_array.join(",") + ")");
 
-        println!();
-        println!("Executing the following CREATE TABLE query ...");
-        println!("{}", create_param);
+        // println!();
+        // println!("Executing the following CREATE TABLE query ...");
+        // println!("{}", create_param);
 
         let result = self.db.conn.query_drop(create_param)?;
 
@@ -341,11 +341,11 @@ impl SmallormEngine {
 
         self.all_exec.extend(v_value);
 
-        println!();
-        println!("Executing the following INSERT query ...");
+        // println!();
+        // println!("Executing the following INSERT query ...");
 
-        println!("{:?} ", &self.prepare);
-        println!("with input {:?} ", &self.all_exec);
+        // println!("{:?} ", &self.prepare);
+        // println!("with input {:?} ", &self.all_exec);
 
         let stmt = self.db.conn.prep(&self.prepare)?;
         let result = self.db.conn.exec_drop(stmt, &self.all_exec)?;
@@ -386,7 +386,7 @@ impl SmallormEngine {
                     hashmap.insert(key.clone(), value.clone());
                 }
             }
-            println!("{:?}", hashmap);
+            // println!("{:?}", hashmap);
             results.push(hashmap);
         }
 
@@ -453,11 +453,11 @@ impl SmallormEngine {
             self.select_param += &format!(" GROUP BY {}", self.group_param);
         }
 
-        println!();
-        println!("Executing the following SELECT query ...");
+        // println!();
+        // println!("Executing the following SELECT query ...");
 
-        println!("{:?} ", &self.select_param);
-        println!("with input {:?} ", &self.all_exec);
+        // println!("{:?} ", &self.select_param);
+        // println!("with input {:?} ", &self.all_exec);
 
         let stmt = self.db.conn.prep(&self.select_param)?;
         let result: Vec<mysql::Row> = self.db.conn.exec(stmt, &self.all_exec)?;
@@ -481,7 +481,7 @@ impl SmallormEngine {
     fn get_column_names(&mut self) -> Vec<String> {
         let describe: Vec<(String, String, Option<String>, Option<String>, Option<String>, Option<String>)> = self.db.conn.query(format!("describe {}", self.get_table())).unwrap();
         let column_names: Vec<String> = describe.iter().map(|(name, _, _, _, _, _)| name.clone()).collect();
-        println!("{:?}", column_names);
+        // println!("{:?}", column_names);
         column_names
     }
 }

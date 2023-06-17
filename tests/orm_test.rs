@@ -1,6 +1,5 @@
 #[cfg(test)]
 mod tests {
-    use super::*;
     use rust_to_mysql::generators::SmallormEngine;
     use rust_to_mysql::my_macro_crate::SQLTable;
     use rust_to_mysql::schema::{Schema, Field, SchemaProvider};
