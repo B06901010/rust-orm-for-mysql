@@ -26,6 +26,7 @@ mod tests {
         }
 
         // Create table according to the struct definition
+        // Usage: engine.create_table(schema, table_name)
         let _ = engine.create_table(Payment::toSchema(), "payment")?;
         let _ = engine.create_table(Customer::toSchema(), "customer")?;
 
@@ -79,9 +80,12 @@ mod tests {
             .update("customer_id", 5);
 
         // Perform various operations on the "customer" table
-        let rows2 = engine.table("customer")
-            .select()?;
+        let rows2 = engine.table("customer").select()?;
         println!("{:?}", rows2);
+
+        // Drop table "payment" and "customer"
+        let _ = engine.table("payment").drop()?;
+        let _ = engine.table("customer").drop()?;
 
         Ok(())
     }

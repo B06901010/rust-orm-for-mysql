@@ -112,9 +112,6 @@ impl SmallormEngine {
 
         self.where_param += &format!("{} {} ?) ", field_name, operator);
         self.where_exec.push(val.to_value());
-        
-        // self.all_exe.extend(self.where_exec.clone());
-
         // println!("where_exec = {:?}", self.where_exec);
         // println!("where_param = {:?}", self.where_param);
         self
@@ -208,11 +205,11 @@ impl SmallormEngine {
             self.all_exec.extend(self.where_exec.clone());
         }
 
-        // println!();
-        // println!("Executing the following UPDATE query ...");
+        println!();
+        println!("Executing the following UPDATE query ...");
 
-        // println!("{:?} ", &self.prepare);
-        // println!("with input {:?} ", &self.all_exec);
+        println!("{:?} ", &self.prepare);
+        println!("with input {:?} ", &self.all_exec);
 
         let stmt = self.db.conn.prep(&self.prepare)?;
         let result = self.db.conn.exec_drop(stmt, &self.all_exec)?;
@@ -235,11 +232,16 @@ impl SmallormEngine {
         // println!("with input {:?} ", &self.where_exec);
 
         self.all_exec = self.where_exec.clone();
-
         let stmt = self.db.conn.prep(&self.prepare)?;
-        // let result = self.db.conn.exec_drop(stmt, &self.where_exec)?;
         let result = self.db.conn.exec_drop(stmt, &self.all_exec)?;
 
+        self.reset_query();
+
+        Ok(result)
+    }
+
+    pub fn drop(&mut self) -> Result<(), Box<dyn Error>> {
+        let result = self.db.conn.query_drop(format!("DROP TABLE {}", self.get_table()))?;
         self.reset_query();
 
         Ok(result)
@@ -275,14 +277,11 @@ impl SmallormEngine {
         T: SchemaProvider,
     {
         let sch = data.to_schema(); // Assuming you have a function to retrieve the schema information
-
-        // self.all_exec = vec![None; sch.field_names.len()];
         let mut v = vec![None; sch.field_names.len()];
         let placeholder = vec!["?"; sch.field_names.len()];
 
         for (f_name, f) in &sch.field_map {
             let field_value = data.get_field_value(f_name).clone();
-            // self.all_exec[f.i as usize] = field_value;
             v[f.i as usize] = field_value;
         }
 
@@ -297,9 +296,6 @@ impl SmallormEngine {
         );
 
         // println!("{:?}", self.prepare);
-
-        // let all_exec_values: Vec<mysql::Value> = self.all_exec
-        // self.all_exec = v
         let v_value : Vec<mysql::Value> = v
         .iter()
         .enumerate()
@@ -363,9 +359,6 @@ impl SmallormEngine {
 
     pub fn select(&mut self) -> Result<Vec<HashMap<String, Value>>, Box<dyn Error>>
     {
-        // self.select_param = format!("SELECT {} FROM {}", f_names.join(","), self.get_table());
-        // let table_name = self.get_table();
-
         if self.select_exec.is_empty() {
             let keys = self.get_column_names();
             self.select_param = format!("SELECT * FROM {}", self.get_table());    
@@ -472,6 +465,7 @@ impl SmallormEngine {
         self.select_exec = Vec::new();
         self.select_param = String::new();
         self.group_param = String::new();
+        self.table_name = String::new();
     }
 
     fn get_table(&self) -> &str {
@@ -491,7 +485,7 @@ impl SmallormEngine {
 mod tests {
     use super::*;
 
-    // #[test]
+    #[test]
     fn test_query() -> Result<(), Box<dyn std::error::Error>> {
         // username, password, url, db_name
         let mut engine = SmallormEngine::new_mysql("wsl", "password", "Julia_vivo.local:3306", "practice")?;
@@ -554,20 +548,25 @@ mod tests {
             .group(vec!["month"])
             .select()?;
 
+        let mut r = engine.table("payment").select()?;
         println!("{:?}", g);
         
         // delete
-        engine.where_("customer_id", "!=", 2).delete();
-        let mut r = engine.table("payment").select()?;
-        println!("{:?}", r);
-
-        // update
-        engine.where_("customer_id", "=", 2).update("customer_id", 5);
+        engine.table("payment")
+            .where_("customer_id", "!=", 2)
+            .delete();
         r = engine.table("payment").select()?;
         println!("{:?}", r);
 
-        // // Clean up the temporary table if needed
-        // conn.query_drop("DROP TABLE payment")?;
+        // update
+        engine.table("payment")
+            .where_("customer_id", "=", 2)
+            .update("customer_id", 5);
+        r = engine.table("payment").select()?;
+        println!("{:?}", r);
+
+        // Clean up the temporary table if needed
+        engine.table("payment").drop()?;
         Ok(())
     }
 }
